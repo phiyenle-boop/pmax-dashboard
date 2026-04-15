@@ -822,6 +822,7 @@ function renderBridge() {
     const v = gb - ga;
     const meta = metaB[k] || metaA[k] || {};
     const row = {k, ga, gb, v, bu: meta.bu||'', pod: meta.pod||''};
+    if(ga === 0 && gb === 0) return;                                // Bỏ qua cả 2 đều = 0
     if(!(k in mapA) || mapA[k] === 0)         gained.push(row);    // New client
     else if(!(k in mapB) || mapB[k] === 0)     lost.push(row);       // Lost client
     else if(v > 0)                             scaleUp.push(row);    // Scale up
