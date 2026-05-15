@@ -76,6 +76,31 @@ th { background: var(--surface2); padding: 8px 12px; text-align: right; font-wei
 th:first-child { text-align: left; }
 td { padding: 8px 12px; text-align: right; border-bottom: 0.5px solid var(--border); color: var(--text); white-space: nowrap; }
 td:first-child { text-align: left; }
+#overview-qtable, #overview-q2table { table-layout: fixed; width: 100%; }
+#overview-qtable th, #overview-q2table th { text-align: center; }
+#overview-qtable th:first-child, #overview-q2table th:first-child { text-align: left; }
+#overview-qtable td:first-child, #overview-q2table td:first-child { text-align: left; }
+#overview-qtable th.week-a-header, #overview-q2table th.week-a-header { background: #e8f3ff; color: #1e3a78; }
+#overview-qtable th.week-b-header, #overview-q2table th.week-b-header { background: #fff4e1; color: #8b5e11; }
+#overview-qtable td, #overview-q2table td { word-break: break-word; }
+#client-table { table-layout: fixed; width: 100%; }
+#client-table th:nth-child(1), #client-table td:nth-child(1) {
+  width: 35%;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+#client-table th:nth-child(2), #client-table td:nth-child(2) { width: 12%; }
+#client-table th:nth-child(3), #client-table td:nth-child(3) { width: 13%; }
+#client-table th:nth-child(4), #client-table td:nth-child(4) { width: 13%; }
+#client-table th:nth-child(5), #client-table td:nth-child(5) { width: 9%; }
+#client-table th:nth-child(6), #client-table td:nth-child(6) { width: 9%; }
+#client-table th:nth-child(7), #client-table td:nth-child(7) { width: 9%; }
+#client-table th:nth-child(8), #client-table td:nth-child(8) { width: 9%; }
+#client-table th.week-a-header, #client-table td.week-a-col { background: #eef6ff; }
+#client-table th.week-b-header, #client-table td.week-b-col { background: #fff7e8; }
+#client-table th:nth-child(2), #client-table th:nth-child(3), #client-table th:nth-child(4),
+#client-table td:nth-child(2), #client-table td:nth-child(3), #client-table td:nth-child(4) { text-align:left; white-space: normal; word-break: break-word; }
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: var(--surface2); }
 .total-row td { font-weight: 600; background: var(--surface2); border-top: 0.5px solid var(--border2); }
@@ -116,8 +141,9 @@ tr:hover td { background: var(--surface2); }
 .quarter-sel label { font-size: 12px; color: var(--text2); font-weight: 500; }
 
 /* CLIENT SEARCH */
-.search-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-.search-bar input { flex: 1; max-width: 300px; padding: 7px 12px; border: 0.5px solid var(--border2); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; color: var(--text); background: var(--surface); }
+.search-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.search-bar input { flex: 1; min-width: 180px; max-width: 320px; padding: 7px 12px; border: 0.5px solid var(--border2); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; color: var(--text); background: var(--surface); }
+.search-bar select { min-width: 150px; padding: 7px 10px; }
 .search-bar input:focus { outline: none; border-color: var(--accent); }
 .client-type-tabs { display: flex; gap: 8px; }
 .type-tab { padding: 5px 12px; border: 0.5px solid var(--border); border-radius: 20px; font-size: 12px; cursor: pointer; color: var(--text2); background: var(--surface); transition: all 0.15s; }
@@ -135,27 +161,6 @@ tr:hover td { background: var(--surface2); }
   .card { padding: 16px; }
   .metric-value { font-size: 18px; }
 }
-
-/* AI SUMMARY */
-.ai-exec{background:#1a1f2e;color:#e8eaf0;border-radius:10px;padding:20px 24px;margin-bottom:12px}
-.ai-exec h3{font-size:15px;font-weight:600;color:#fff;margin-bottom:12px}
-.ai-exec-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.ai-exec-col p{font-size:13px;line-height:1.7;color:#c8cad4}
-.ai-action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ai-action-item{padding:12px 14px;border-radius:8px;border-left:3px solid}
-.ai-action-item.p0{background:#fff0f0;border-color:#ef4444}
-.ai-action-item.p1{background:#fffbeb;border-color:#f59e0b}
-.ai-action-item.p2{background:#f0fdf4;border-color:#22c55e}
-.ai-action-item .pri{font-size:11px;font-weight:700;letter-spacing:0.5px;margin-bottom:4px}
-.ai-action-item.p0 .pri{color:#ef4444}
-.ai-action-item.p1 .pri{color:#f59e0b}
-.ai-action-item.p2 .pri{color:#22c55e}
-.ai-action-item p{font-size:12px;line-height:1.6;color:var(--text2)}
-.ai-insights{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
-.ai-insight{background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:14px 16px}
-.ai-insight .ititle{font-size:12px;font-weight:600;color:var(--accent);margin-bottom:6px}
-.ai-insight p{font-size:12px;line-height:1.6;color:var(--text2)}
-@media(max-width:768px){.ai-exec-row,.ai-action-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -172,7 +177,7 @@ tr:hover td { background: var(--surface2); }
   </div>
   <div class="ctrl-group">
     <span class="ctrl-label">Week B (Compare)</span>
-    <select id="weekB"></select>
+    <select id="weekB" onchange="syncWeekAWithWeekB()"></select>
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
@@ -228,10 +233,6 @@ tr:hover td { background: var(--surface2); }
 
   <!-- VIEW 0: OVERVIEW -->
   <div class="view" id="view-0">
-    <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:12px">
-      <button id="ai-btn" onclick="generateAISummary()" style="display:flex;align-items:center;gap:6px;padding:7px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-family:inherit">&#10024; Generate AI Insights</button>
-    </div>
-    <div id="ai-summary-box" style="display:none;margin-bottom:16px"></div>
     <div class="metric-grid" id="overview-metrics" style="display:block"></div>
     <div class="card">
       <div class="card-title">Quarterly Summary</div>
@@ -292,13 +293,13 @@ tr:hover td { background: var(--surface2); }
       <div class="sub-tab" onclick="switchBreakdown(2)">Function</div>
       <div class="sub-tab" onclick="switchBreakdown(3)">Solution</div>
       <div class="sub-tab" onclick="switchBreakdown(4)">Vertical</div>
-      <div class="sub-tab" onclick="switchBreakdown(5)">BU Detail</div>
+      <div class="sub-tab" onclick="switchBreakdown(5)">Detail</div>
     </div>
-    <div class="card">
+    <div class="card" id="bd-q2-card">
       <div class="card-title" id="bd-q2-title">Q2 — GP2 vs GP2 new_new</div>
       <div class="table-wrap"><table id="bd-q2-table"></table></div>
     </div>
-    <div class="card">
+    <div class="card" id="bd-fy-card">
       <div class="card-title" id="bd-fy-title">Full Year — GP2 vs GP2 new_new</div>
       <div class="table-wrap"><table id="bd-fy-table"></table></div>
     </div>
@@ -316,11 +317,21 @@ tr:hover td { background: var(--surface2); }
   <!-- VIEW 4: CLIENT DEEP DIVE -->  <div class="view" id="view-3">
     <div class="search-bar">
       <input type="text" id="client-search" placeholder="Tìm client..." oninput="filterClients()">
+      <select id="client-bu-filter" onchange="filterClients()">
+        <option value="all">All BU</option>
+      </select>
+      <select id="client-pod-filter" onchange="filterClients()">
+        <option value="all">All Pod Director</option>
+      </select>
+      <select id="client-fn-filter" onchange="filterClients()">
+        <option value="all">All Function</option>
+      </select>
       <div class="client-type-tabs">
         <div class="type-tab active" onclick="setClientType('all')">Tất cả</div>
         <div class="type-tab" onclick="setClientType('lost')">🔴 Lost</div>
         <div class="type-tab" onclick="setClientType('new')">🟢 New</div>
-        <div class="type-tab" onclick="setClientType('existing')">📊 Existing</div>
+        <div class="type-tab" onclick="setClientType('existing-up')">📈 Existing Scale-up</div>
+        <div class="type-tab" onclick="setClientType('existing-down')">📉 Existing Scale-down</div>
       </div>
     </div>
     <div class="card">
@@ -362,7 +373,7 @@ tr:hover td { background: var(--surface2); }
 </main>
 
 <script>
-const SHEETDB_URL = 'https://sheetdb.io/api/v1/0uhjrk599cplw';
+const SHEETDB_URL = 'https://sheetdb.io/api/v1/k62qf71nx5a1r';
 
 let rawData = [];
 let weeks = [];
@@ -500,12 +511,27 @@ function processData() {
   selB.innerHTML = weeks.map((w,i) => `<option value="${w}"${i===weeks.length-1?' selected':''}>${fmtDate(w)}</option>`).join('');
 
   // Đặt value thủ công để đảm bảo DOM cập nhật trước khi render
-  if(weeks.length > 0) {
-    selA.value = weeks[0];
+  if(weeks.length > 1) {
     selB.value = weeks[weeks.length - 1];
+    selA.value = weeks[weeks.length - 2];
+  } else if(weeks.length === 1) {
+    selA.value = weeks[0];
+    selB.value = weeks[0];
   }
 
   updateMonthOptions();
+  renderAll();
+}
+
+function syncWeekAWithWeekB() {
+  const selA = document.getElementById('weekA');
+  const selB = document.getElementById('weekB');
+  const idx = weeks.indexOf(selB.value);
+  if (idx > 0) {
+    selA.value = weeks[idx - 1];
+  } else if (weeks.length > 0) {
+    selA.value = weeks[0];
+  }
   renderAll();
 }
 
@@ -623,13 +649,19 @@ function renderOverview() {
   const q2B = fyB;
   const q2Var = q2B - q2A;
 
-  document.getElementById  // GP2 new_new and Adjust GP2
-  const nn_A = sumGP(filterQ(wkAData), 'GP2 new_new');
-  const nn_B = sumGP(filterQ(wkBData), 'GP2 new_new');
+  const filteredA = filterQ(wkAData);
+  const filteredB = filterQ(wkBData);
+
+  const nn_A = sumGP(filteredA, 'GP2 new_new');
+  const nn_B = sumGP(filteredB, 'GP2 new_new');
   const nn_Var = nn_B - nn_A;
   const nn_Pct = nn_A ? nn_Var/nn_A : 0;
-  const adj_A = sumGP(filterQ(wkAData), 'Adjust GP2');
-  const adj_B = sumGP(filterQ(wkBData), 'Adjust GP2');
+  const totalA = fyA + nn_A;
+  const totalB = fyB + nn_B;
+  const totalVar = totalB - totalA;
+  const totalPct = totalA ? totalVar/totalA : 0;
+  const adj_A = sumGP(filteredA, 'Adjust GP2');
+  const adj_B = sumGP(filteredB, 'Adjust GP2');
   const adj_Var = adj_B - adj_A;
   const adj_Pct = adj_A ? adj_Var/adj_A : 0;
 
@@ -641,10 +673,10 @@ function renderOverview() {
     const card = (lbl, val, sub, color='') => `<div class="metric-card"><div class="metric-label">${lbl}</div><div class="metric-value" ${color?'style="color:'+color+'"':''}>${val}</div><div class="metric-sub" style="color:${color||'var(--text3)'}">${sub}</div></div>`;
     const vc = (v) => v>=0 ? 'var(--green)' : 'var(--red)';
 
-    return gt('#378ADD','GP2') + grid(
-      card(getQLabel()+' — '+fmtDate(a), fmtM(fyA), 'M VNĐ') +
-      card(getQLabel()+' — '+fmtDate(b), fmtM(fyB), 'M VNĐ') +
-      card('Variance '+getQLabel(), (fyVar>=0?'+':'')+fmtM(fyVar), fmtPct(fyPct), vc(fyVar))
+    return gt('#378ADD','Total GP2') + grid(
+      card(getQLabel()+' — '+fmtDate(a), fmtM(totalA), 'M VNĐ') +
+      card(getQLabel()+' — '+fmtDate(b), fmtM(totalB), 'M VNĐ') +
+      card('Variance '+getQLabel(), (totalVar>=0?'+':'')+fmtM(totalVar), fmtPct(totalPct), vc(totalVar))
     ) +
     '<div style="height:0.5px;background:var(--border);margin:4px 0 12px"></div>' +
     gt('#1D9E75','GP2 new_new') + grid(
@@ -662,47 +694,88 @@ function renderOverview() {
 
   // Quarterly table
   let qRows = '';
-  let totA=0,totB=0;
+  let totAGP2 = 0, totANN = 0, totA = 0;
+  let totBGP2 = 0, totBNN = 0, totB = 0;
   [1,2,3,4].forEach(q => {
-    const dA = wkAData.filter(r=>parseInt(r.Quarter)===q);
-    const dB = wkBData.filter(r=>parseInt(r.Quarter)===q);
-    const ga = sumGP(dA,'GP2'), gb = sumGP(dB,'GP2');
-    const v = gb-ga, p = ga?v/ga:0;
-    totA+=ga; totB+=gb;
+    const dA = filteredA.filter(r=>parseInt(r.Quarter)===q);
+    const dB = filteredB.filter(r=>parseInt(r.Quarter)===q);
+    const ga_gp2 = sumGP(dA,'GP2');
+    const ga_nn = sumGP(dA,'GP2 new_new');
+    const ga_total = ga_gp2 + ga_nn;
+    const gb_gp2 = sumGP(dB,'GP2');
+    const gb_nn = sumGP(dB,'GP2 new_new');
+    const gb_total = gb_gp2 + gb_nn;
+    const v = gb_total-ga_total, p = ga_total?v/ga_total:0;
+    totAGP2 += ga_gp2; totANN += ga_nn; totA += ga_total;
+    totBGP2 += gb_gp2; totBNN += gb_nn; totB += gb_total;
     const months = QTR_MONTHS[q].map(m=>MONTH_NAMES[m]).join('–');
     qRows += `<tr>
       <td><b>Q${q}</b> <span style="color:var(--text3);font-size:12px">(${months})</span></td>
-      <td>${fmtM(ga)}</td><td>${fmtM(gb)}</td>
+      <td>${fmtM(ga_gp2)}</td><td>${fmtM(ga_nn)}</td><td>${fmtM(ga_total)}</td>
+      <td>${fmtM(gb_gp2)}</td><td>${fmtM(gb_nn)}</td><td>${fmtM(gb_total)}</td>
       <td class="${varClass(v)}">${v>=0?'+':''}${fmtM(v)}</td>
       <td class="${varClass(p)}">${fmtPct(p)}</td>
     </tr>`;
   });
   const tv = totB-totA, tp = totA?tv/totA:0;
   document.getElementById('overview-qtable').innerHTML = `
-    <thead><tr><th>Quarter</th><th>${fmtDate(a)}</th><th>${fmtDate(b)}</th><th>Variance (M)</th><th>Var%</th></tr></thead>
-    <tbody>${qRows}<tr class="total-row"><td>Full Year</td><td>${fmtM(totA)}</td><td>${fmtM(totB)}</td><td class="${varClass(tv)}">${tv>=0?'+':''}${fmtM(tv)}</td><td class="${varClass(tp)}">${fmtPct(tp)}</td></tr></tbody>`;
+    <thead>
+      <tr>
+        <th rowspan="2">Quarter</th>
+        <th colspan="3" class="week-a-header">${fmtDate(a)}</th>
+        <th colspan="3" class="week-b-header">${fmtDate(b)}</th>
+        <th rowspan="2">Variance (M)</th>
+        <th rowspan="2">Var%</th>
+      </tr>
+      <tr>
+        <th>GP2</th><th>GP2 new_new</th><th>Total GP2</th>
+        <th>GP2</th><th>GP2 new_new</th><th>Total GP2</th>
+      </tr>
+    </thead>
+    <tbody>${qRows}<tr class="total-row"><td>Full Year</td><td>${fmtM(totAGP2)}</td><td>${fmtM(totANN)}</td><td>${fmtM(totA)}</td><td>${fmtM(totBGP2)}</td><td>${fmtM(totBNN)}</td><td>${fmtM(totB)}</td><td class="${varClass(tv)}">${tv>=0?'+':''}${fmtM(tv)}</td><td class="${varClass(tp)}">${fmtPct(tp)}</td></tr></tbody>`;
 
   // Monthly detail for selected quarter
-  const qMonths = getQ()===0?[1,2,3,4,5,6,7,8,9,10,11,12]:(QTR_MONTHS[getQ()]||[4,5,6]);
+  const qMonths = getM() > 0
+    ? [getM()]
+    : getQ()===0
+      ? [1,2,3,4,5,6,7,8,9,10,11,12]
+      : (QTR_MONTHS[getQ()] || []);
   let mRows = '';
   qMonths.forEach(m => {
-    const dA = wkAData.filter(r=>getMonthNum(r.Month)===m);
-    const dB = wkBData.filter(r=>getMonthNum(r.Month)===m);
-    const ga = sumGP(dA,'GP2'), gb = sumGP(dB,'GP2');
-    const v = gb-ga, p = ga?v/ga:0;
-    mRows += `<tr><td>${MONTH_NAMES[m]}</td><td>${fmtM(ga)}</td><td>${fmtM(gb)}</td><td class="${varClass(v)}">${v>=0?'+':''}${fmtM(v)}</td><td class="${varClass(p)}">${fmtPct(p)}</td></tr>`;
+    const dA = filteredA.filter(r=>getMonthNum(r.Month)===m);
+    const dB = filteredB.filter(r=>getMonthNum(r.Month)===m);
+    const ga_gp2 = sumGP(dA,'GP2');
+    const ga_nn = sumGP(dA,'GP2 new_new');
+    const ga_total = ga_gp2 + ga_nn;
+    const gb_gp2 = sumGP(dB,'GP2');
+    const gb_nn = sumGP(dB,'GP2 new_new');
+    const gb_total = gb_gp2 + gb_nn;
+    const v = gb_total-ga_total, p = ga_total?v/ga_total:0;
+    mRows += `<tr><td>${MONTH_NAMES[m]}</td><td>${fmtM(ga_gp2)}</td><td>${fmtM(ga_nn)}</td><td>${fmtM(ga_total)}</td><td>${fmtM(gb_gp2)}</td><td>${fmtM(gb_nn)}</td><td>${fmtM(gb_total)}</td><td class="${varClass(v)}">${v>=0?'+':''}${fmtM(v)}</td><td class="${varClass(p)}">${fmtPct(p)}</td></tr>`;
   });
   document.getElementById('overview-q2table').innerHTML = `
-    <thead><tr><th>Tháng</th><th>${fmtDate(a)}</th><th>${fmtDate(b)}</th><th>Variance (M)</th><th>Var%</th></tr></thead>
+    <thead>
+      <tr>
+        <th rowspan="2">Tháng</th>
+        <th colspan="3" class="week-a-header">${fmtDate(a)}</th>
+        <th colspan="3" class="week-b-header">${fmtDate(b)}</th>
+        <th rowspan="2">Variance (M)</th>
+        <th rowspan="2">Var%</th>
+      </tr>
+      <tr>
+        <th>GP2</th><th>GP2 new_new</th><th>Total GP2</th>
+        <th>GP2</th><th>GP2 new_new</th><th>Total GP2</th>
+      </tr>
+    </thead>
     <tbody>${mRows}</tbody>`;
 
   // Finding
   const topQ = [1,2,3,4].map(q => {
-    const ga = sumGP(wkAData.filter(r=>parseInt(r.Quarter)===q),'GP2');
-    const gb = sumGP(wkBData.filter(r=>parseInt(r.Quarter)===q),'GP2');
+    const ga = sumGP(filteredA.filter(r=>parseInt(r.Quarter)===q),'GP2') + sumGP(filteredA.filter(r=>parseInt(r.Quarter)===q),'GP2 new_new');
+    const gb = sumGP(filteredB.filter(r=>parseInt(r.Quarter)===q),'GP2') + sumGP(filteredB.filter(r=>parseInt(r.Quarter)===q),'GP2 new_new');
     return {q, v:gb-ga, p:ga?(gb-ga)/ga:0};
   }).sort((a,b)=>a.v-b.v)[0];
-  document.getElementById('overview-finding').innerHTML = `<strong>🔑 Key Finding:</strong> Full Year variance <span class="${varClass(fyVar)}">${fyVar>=0?'+':''}${fmtM(fyVar)}M (${(fyPct*100).toFixed(1)}%)</span>. Quarter có biến động lớn nhất: <b>Q${topQ.q}</b> <span class="${varClass(topQ.v)}">(${topQ.v>=0?'+':''}${fmtM(topQ.v)}M, ${(topQ.p*100).toFixed(1)}%)</span>.`;
+  document.getElementById('overview-finding').innerHTML = `<strong>🔑 Key Finding:</strong> Full Year Total GP2 variance <span class="${varClass(totalVar)}">${totalVar>=0?'+':''}${fmtM(totalVar)}M (${(totalPct*100).toFixed(1)}%)</span>. Quarter có biến động lớn nhất: <b>Q${topQ.q}</b> <span class="${varClass(topQ.v)}">(${topQ.v>=0?'+':''}${fmtM(topQ.v)}M, ${(topQ.p*100).toFixed(1)}%)</span>.`;
 }
 
 // ── MONTHLY SUMMARY ────────────────────────────────────────────────────────
@@ -760,16 +833,27 @@ function renderBDTable(id, dA, dB, dim, a, b) {
   const totA_nn = Object.values(gpA_nn).reduce((s,v)=>s+v,0);
   const totB_nn = Object.values(gpB_nn).reduce((s,v)=>s+v,0);
 
+  // Also aggregate Adjust GP2 (used for Total GP2 = Adjusted GP + GP2 new_new)
+  const adjA = groupSum(dA, dim, 'Adjust GP2');
+  const adjB = groupSum(dB, dim, 'Adjust GP2');
+  const totAdjA = Object.values(adjA).reduce((s,v)=>s+v,0);
+  const totAdjB = Object.values(adjB).reduce((s,v)=>s+v,0);
+
   const sorted = allKeys.map(k => {
     const ga=keysA[k]||0, gb=keysB[k]||0;
     const v=gb-ga, p=ga?v/ga:0;
-    return {k,ga,gb,v,p,ga_nn:gpA_nn[k]||0,gb_nn:gpB_nn[k]||0};
+    return {k,ga,gb,v,p,ga_nn:gpA_nn[k]||0,gb_nn:gpB_nn[k]||0,adj_a:adjA[k]||0,adj_b:adjB[k]||0};
   }).sort((a,b)=>a.v-b.v);
 
-  let rows = sorted.map(({k,ga,gb,v,p,ga_nn,gb_nn}) => {
+  let rows = sorted.map(({k,ga,gb,v,p,ga_nn,gb_nn,adj_a,adj_b}) => {
     const v_nn = gb_nn-ga_nn;
     const shareA = totA ? (ga/totA*100).toFixed(1)+'%' : '–';
     const shareB = totB ? (gb/totB*100).toFixed(1)+'%' : '–';
+    // Total GP2 = Adjusted GP + GP2 new_new
+    const totGP2_a = ga + ga_nn;
+    const totGP2_b = gb + gb_nn;
+    const totGP2_v = totGP2_b - totGP2_a;
+    const totGP2_p = totGP2_a ? totGP2_v/totGP2_a : 0;
     return `<tr>
       <td>${k}</td>
       <td>${fmtM(ga)}</td><td>${fmtM(gb)}</td>
@@ -778,12 +862,20 @@ function renderBDTable(id, dA, dB, dim, a, b) {
       <td style="color:var(--text3)">${shareA}</td><td style="color:var(--text3)">${shareB}</td>
       <td>${fmtM(ga_nn)}</td><td>${fmtM(gb_nn)}</td>
       <td class="${varClass(v_nn)}">${v_nn>=0?'+':''}${fmtM(v_nn)}</td>
+      <td style="background:#fef8e8">${fmtM(totGP2_a)}</td>
+      <td style="background:#fef8e8">${fmtM(totGP2_b)}</td>
+      <td class="${varClass(totGP2_v)}" style="background:#fef8e8">${totGP2_v>=0?'+':''}${fmtM(totGP2_v)}</td>
+      <td class="${varClass(totGP2_p)}" style="background:#fef8e8">${fmtPct(totGP2_p)}</td>
       <td>${driver(p)}</td>
     </tr>`;
   }).join('');
 
   const tv=totB-totA,tp=totA?tv/totA:0;
   const tv_nn=totB_nn-totA_nn;
+  const totTotGP2_a = totA + totA_nn;
+  const totTotGP2_b = totB + totB_nn;
+  const totTotGP2_v = totTotGP2_b - totTotGP2_a;
+  const totTotGP2_p = totTotGP2_a ? totTotGP2_v/totTotGP2_a : 0;
 
   document.getElementById(id).innerHTML = `
     <thead>
@@ -792,6 +884,7 @@ function renderBDTable(id, dA, dB, dim, a, b) {
         <th colspan="4" style="text-align:center;border-bottom:0.5px solid var(--border);background:#e8f0f8;color:var(--accent)">Adjusted GP</th>
         <th colspan="2" style="text-align:center;border-bottom:0.5px solid var(--border);background:var(--surface2)">Share</th>
         <th colspan="3" style="text-align:center;border-bottom:0.5px solid var(--border);background:#f0f5e8;color:var(--green)">GP2 new_new</th>
+        <th colspan="4" style="text-align:center;border-bottom:0.5px solid var(--border);background:#fef8e8;color:#8a6d00">Total GP2</th>
         <th rowspan="2" style="vertical-align:bottom">Driver</th>
       </tr>
       <tr>
@@ -803,6 +896,10 @@ function renderBDTable(id, dA, dB, dim, a, b) {
         <th style="background:#f0f5e8">${fmtDate(a)}</th>
         <th style="background:#f0f5e8">${fmtDate(b)}</th>
         <th style="background:#f0f5e8">Var (M)</th>
+        <th style="background:#fef8e8">${fmtDate(a)}</th>
+        <th style="background:#fef8e8">${fmtDate(b)}</th>
+        <th style="background:#fef8e8">Var (M)</th>
+        <th style="background:#fef8e8">Var%</th>
       </tr>
     </thead>
     <tbody>${rows}
@@ -814,6 +911,10 @@ function renderBDTable(id, dA, dB, dim, a, b) {
         <td>100%</td><td>100%</td>
         <td>${fmtM(totA_nn)}</td><td>${fmtM(totB_nn)}</td>
         <td class="${varClass(tv_nn)}">${tv_nn>=0?'+':''}${fmtM(tv_nn)}</td>
+        <td style="background:#fef8e8">${fmtM(totTotGP2_a)}</td>
+        <td style="background:#fef8e8">${fmtM(totTotGP2_b)}</td>
+        <td class="${varClass(totTotGP2_v)}" style="background:#fef8e8">${totTotGP2_v>=0?'+':''}${fmtM(totTotGP2_v)}</td>
+        <td class="${varClass(totTotGP2_p)}" style="background:#fef8e8">${fmtPct(totTotGP2_p)}</td>
         <td></td>
       </tr>
     </tbody>`;
@@ -829,10 +930,14 @@ function renderBreakdown() {
   const lbl = isDetail ? 'BU' : BD_LABELS[currentBreakdown];
 
   document.getElementById('bd-detail-card').style.display = isDetail ? 'block' : 'none';
-  document.getElementById('bd-q2-title').textContent = qlabel + ' — ' + lbl + ' | GP2 vs GP2 new_new (M VND)';
-  document.getElementById('bd-fy-title').textContent = 'Full Year — ' + lbl + ' | GP2 vs GP2 new_new (M VND)';
-  renderBDTable('bd-q2-table', filterQ(wkAData), filterQ(wkBData), dim, a, b);
-  renderBDTable('bd-fy-table', wkAData, wkBData, dim, a, b);
+  document.getElementById('bd-q2-card').style.display = isDetail ? 'none' : 'block';
+  document.getElementById('bd-fy-card').style.display = isDetail ? 'none' : 'block';
+  if (!isDetail) {
+    document.getElementById('bd-q2-title').textContent = qlabel + ' — ' + lbl + ' | GP2 vs GP2 new_new (M VND)';
+    document.getElementById('bd-fy-title').textContent = 'Full Year — ' + lbl + ' | GP2 vs GP2 new_new (M VND)';
+    renderBDTable('bd-q2-table', filterQ(wkAData), filterQ(wkBData), dim, a, b);
+    renderBDTable('bd-fy-table', wkAData, wkBData, dim, a, b);
+  }
   if(isDetail) renderBUDetailTable();
 }
 
@@ -850,14 +955,14 @@ function renderBUDetailTable() {
   const b = document.getElementById('weekB').value;
   const subDim = BU_DETAIL_DIMS[currentBUDetail];
   const subLabel = BU_DETAIL_LABELS[currentBUDetail];
-  document.getElementById('bd-detail-title').textContent = getQLabel() + ' — BU / ' + subLabel + ' · GP2 (M VND) | ' + fmtDate(a) + ' vs ' + fmtDate(b);
+  document.getElementById('bd-detail-title').textContent = getQLabel() + ' — BU / ' + subLabel + ' · Total GP2 (M VND) | ' + fmtDate(a) + ' vs ' + fmtDate(b);
 
   _buDetailDataA = filterQ(wkAData);
   _buDetailDataB = filterQ(wkBData);
   const dA = _buDetailDataA;
   const dB = _buDetailDataB;
-  const buA = groupSum(dA,'BU','GP2');
-  const buB = groupSum(dB,'BU','GP2');
+  const buA = groupSum(dA,'BU','Adjust GP2');
+  const buB = groupSum(dB,'BU','Adjust GP2');
   const allBUs = [...new Set([...Object.keys(buA),...Object.keys(buB)])].sort(function(x,y){ return (buB[y]||0)-(buB[x]||0); });
   const totA = Object.values(buA).reduce(function(s,v){return s+v;},0);
   const totB = Object.values(buB).reduce(function(s,v){return s+v;},0);
@@ -876,8 +981,8 @@ function renderBUDetailTable() {
     rows += '<td>' + driver(p) + '</td></tr>';
 
     // Layer 2: sub-dimension rows
-    const subA = groupSum(dA.filter(function(r){return r.BU===bu;}), subDim,'GP2');
-    const subB = groupSum(dB.filter(function(r){return r.BU===bu;}), subDim,'GP2');
+    const subA = groupSum(dA.filter(function(r){return r.BU===bu;}), subDim,'Adjust GP2');
+    const subB = groupSum(dB.filter(function(r){return r.BU===bu;}), subDim,'Adjust GP2');
     const allSubs = [...new Set([...Object.keys(subA),...Object.keys(subB)])].sort(function(x,y){return (subB[y]||0)-(subB[x]||0);});
     allSubs.forEach(function(sub) {
       const sa=subA[sub]||0, sb=subB[sub]||0, sv=sb-sa, sp=sa?sv/sa:0;
@@ -895,8 +1000,8 @@ function renderBUDetailTable() {
       const cliRowsA = dA.filter(function(r){return r.BU===bu && r[subDimCol]===sub;});
       const cliRowsB = dB.filter(function(r){return r.BU===bu && r[subDimCol]===sub;});
       const cliMapA = {}, cliMapB = {};
-      cliRowsA.forEach(function(r){const k=buildClientKey(r); cliMapA[k]=(cliMapA[k]||0)+(parseFloat(r.GP2)||0);});
-      cliRowsB.forEach(function(r){const k=buildClientKey(r); cliMapB[k]=(cliMapB[k]||0)+(parseFloat(r.GP2)||0);});
+      cliRowsA.forEach(function(r){const k=buildClientKey(r); cliMapA[k]=(cliMapA[k]||0)+(parseFloat(r['Adjust GP2'])||0);});
+      cliRowsB.forEach(function(r){const k=buildClientKey(r); cliMapB[k]=(cliMapB[k]||0)+(parseFloat(r['Adjust GP2'])||0);});
       const allClis = [...new Set([...Object.keys(cliMapA),...Object.keys(cliMapB)])].sort(function(x,y){return Math.abs((cliMapB[y]||0)-(cliMapA[y]||0))-Math.abs((cliMapB[x]||0)-(cliMapA[x]||0));});
       allClis.forEach(function(cli) {
         const ca=cliMapA[cli]||0, cb=cliMapB[cli]||0, cv=cb-ca, cp=ca?cv/ca:0;
@@ -952,43 +1057,93 @@ function buildClientKey(r) { return r['Client Name'] || r['Client Code'] || '(Un
 function renderClients() {
   const a = document.getElementById('weekA').value;
   const b = document.getElementById('weekB').value;
-  document.getElementById('client-title').textContent = `Client Deep Dive — ${getQLabel()} · GP2 (M VNĐ) | ${fmtDate(a)} vs ${fmtDate(b)}`;
+  document.getElementById('client-title').textContent = `Client Deep Dive — ${getQLabel()} · Adjust GP2 (M VNĐ) | ${fmtDate(a)} vs ${fmtDate(b)}`;
   let dA = filterQ(wkAData);
   let dB = filterQ(wkBData);
 
   // Aggregate by client key
   const mapA = {}, mapB = {};
   const metaA = {}, metaB = {};
+  const fnSetA = {}, fnSetB = {};
+  const fnValA = {}, fnValB = {};
+  const buSetA = {}, buSetB = {};
   dA.forEach(r => {
     const k = buildClientKey(r);
-    mapA[k] = (mapA[k]||0) + (parseFloat(r['GP2'])||0);
-    metaA[k] = {bu: r.BU, pod: r['Pod Director'], fn: r['Fin Function'], sol: r['Fin Solution']};
+    mapA[k] = (mapA[k]||0) + (parseFloat(r['Adjust GP2'])||0);
+    metaA[k] = metaA[k] || {pod: r['Pod Director'], sol: r['Fin Solution']};
+    fnSetA[k] = fnSetA[k] || new Set();
+    fnValA[k] = fnValA[k] || {};
+    buSetA[k] = buSetA[k] || new Set();
+    if(r['Fin Function']) {
+      fnSetA[k].add(r['Fin Function']);
+      fnValA[k][r['Fin Function']] = (fnValA[k][r['Fin Function']]||0) + (parseFloat(r['Adjust GP2'])||0);
+    }
+    if(r.BU) buSetA[k].add(r.BU);
   });
   dB.forEach(r => {
     const k = buildClientKey(r);
-    mapB[k] = (mapB[k]||0) + (parseFloat(r['GP2'])||0);
-    metaB[k] = {bu: r.BU, pod: r['Pod Director'], fn: r['Fin Function'], sol: r['Fin Solution']};
+    mapB[k] = (mapB[k]||0) + (parseFloat(r['Adjust GP2'])||0);
+    metaB[k] = metaB[k] || {pod: r['Pod Director'], sol: r['Fin Solution']};
+    fnSetB[k] = fnSetB[k] || new Set();
+    fnValB[k] = fnValB[k] || {};
+    buSetB[k] = buSetB[k] || new Set();
+    if(r['Fin Function']) {
+      fnSetB[k].add(r['Fin Function']);
+      fnValB[k][r['Fin Function']] = (fnValB[k][r['Fin Function']]||0) + (parseFloat(r['Adjust GP2'])||0);
+    }
+    if(r.BU) buSetB[k].add(r.BU);
   });
 
   const allKeys = [...new Set([...Object.keys(mapA), ...Object.keys(mapB)])];
   clientAllRows = allKeys.map(k => {
     const ga = mapA[k]||0, gb = mapB[k]||0;
-    if(ga === 0 && gb === 0) return null; // bỏ qua cả 2 đều = 0
+    if(ga === 0 && gb === 0) return null;
     const v = gb-ga, p = ga?(v/ga):0;
     let type = 'existing';
     if(ga === 0 || !(k in mapA)) type = 'new';
     else if(gb === 0 || !(k in mapB)) type = 'lost';
+    const allFns = [...new Set([...(fnSetA[k]||[]), ...(fnSetB[k]||[])])].filter(Boolean);
+    const fnList = allFns.filter(fn => {
+      const fa = (fnValA[k] && fnValA[k][fn]) || 0;
+      const fb = (fnValB[k] && fnValB[k][fn]) || 0;
+      return fa !== 0 || fb !== 0;
+    });
+    const buList = [...new Set([...(buSetA[k]||[]), ...(buSetB[k]||[])])].filter(Boolean);
     const meta = metaB[k] || metaA[k] || {};
-    return {k, ga, gb, v, p, type, bu: meta.bu||'', pod: meta.pod||'', fn: meta.fn||'', sol: meta.sol||''};
+    return {
+      k,
+      ga,
+      gb,
+      v,
+      p,
+      type,
+      bu: buList.join(', '),
+      pod: meta.pod || '',
+      fnList,
+      fn: fnList.join(', '),
+      sol: meta.sol || ''
+    };
   }).filter(r => r !== null);
 
+  populateClientFilters(clientAllRows);
   filterClients();
 }
 
 function filterClients() {
   const q = (document.getElementById('client-search').value||'').toLowerCase();
+  const buFilter = document.getElementById('client-bu-filter').value;
+  const podFilter = document.getElementById('client-pod-filter').value;
+  const fnFilter = document.getElementById('client-fn-filter').value;
   let rows = clientAllRows;
-  if(currentClientType !== 'all') rows = rows.filter(r=>r.type===currentClientType);
+  if(currentClientType !== 'all') {
+    if(currentClientType === 'lost') rows = rows.filter(r=>r.type==='lost');
+    else if(currentClientType === 'new') rows = rows.filter(r=>r.type==='new');
+    else if(currentClientType === 'existing-up') rows = rows.filter(r=>r.type==='existing' && r.v > 0);
+    else if(currentClientType === 'existing-down') rows = rows.filter(r=>r.type==='existing' && r.v < 0);
+  }
+  if(buFilter && buFilter !== 'all') rows = rows.filter(r=>r.bu.split(', ').includes(buFilter));
+  if(podFilter && podFilter !== 'all') rows = rows.filter(r=>r.pod === podFilter);
+  if(fnFilter && fnFilter !== 'all') rows = rows.filter(r=>r.fnList.includes(fnFilter));
   if(q) rows = rows.filter(r=>r.k.toLowerCase().includes(q));
 
   // Sort: lost by ga desc, new by gb desc, existing by |v| desc
@@ -1005,25 +1160,140 @@ function filterClients() {
 
   let html = '';
   let lastType = null;
-  rows.slice(0,200).forEach(r => {
+  let typeTotals = {lost:{ga:0,gb:0,v:0}, new:{ga:0,gb:0,v:0}, existing:{ga:0,gb:0,v:0}};
+  let sectionDetailsHtml = ''; // Buffer for rows within a section
+  const labels = {
+    lost:'🔴 LOST CLIENTS (có trong Week A, mất trong Week B)',
+    new:'🟢 NEW CLIENTS (có trong Week B, không có trong Week A)',
+    existing: currentClientType === 'existing-up' ? '📈 EXISTING SCALE-UP' : currentClientType === 'existing-down' ? '📉 EXISTING SCALE-DOWN' : '📊 EXISTING CLIENTS (biến động lớn nhất)'
+  };
+  
+  const flushSection = (type) => {
+    if(type && typeTotals[type]) {
+      const tp = typeTotals[type].ga ? typeTotals[type].v / typeTotals[type].ga : 0;
+      html += `<tr class="section-header">
+        <td colspan="4">${labels[type]}</td>
+        <td><strong>${fmtM(typeTotals[type].ga)}</strong></td>
+        <td><strong>${fmtM(typeTotals[type].gb)}</strong></td>
+        <td><strong class="${varClass(typeTotals[type].v)}">${typeTotals[type].v>=0?'+':''}${fmtM(typeTotals[type].v)}</strong></td>
+        <td><strong>${fmtPct(tp)}</strong></td>
+      </tr>` + sectionDetailsHtml;
+      sectionDetailsHtml = '';
+    }
+  };
+  
+  rows.slice(0,200).forEach((r, idx, arr) => {
     if(r.type !== lastType) {
-      const labels = {lost:'🔴 LOST CLIENTS (có trong Week A, mất trong Week B)', new:'🟢 NEW CLIENTS (có trong Week B, không có trong Week A)', existing:'📊 EXISTING CLIENTS (biến động lớn nhất)'};
-      html += `<tr class="section-header"><td colspan="7">${labels[r.type]}</td></tr>`;
+      flushSection(lastType);
       lastType = r.type;
+      typeTotals[r.type] = {ga:0,gb:0,v:0};
     }
     const typeBadge = r.type==='lost' ? '<span class="badge badge-red">Lost</span>' : r.type==='new' ? '<span class="badge badge-green">New</span>' : '';
-    html += `<tr>
-      <td>${r.k} ${typeBadge}</td>
-      <td>${r.bu}</td><td>${r.pod}</td>
-      <td>${fmtM(r.ga)}</td><td>${fmtM(r.gb)}</td>
-      <td class="${varClass(r.v)}">${r.v>=0?'+':''}${fmtM(r.v)}</td>
-      <td class="${varClass(r.p)}">${fmtPct(r.p)}</td>
-    </tr>`;
+    const safeKey = r.k.replace(/[^a-zA-Z0-9]/g,'_');
+    const visibleFns = r.fnList.filter(fn => {
+      const fa = filterQ(wkAData).filter(rr => buildClientKey(rr) === r.k && rr['Fin Function'] === fn).reduce((s,rr)=>s+(parseFloat(rr['Adjust GP2'])||0),0);
+      const fb = filterQ(wkBData).filter(rr => buildClientKey(rr) === r.k && rr['Fin Function'] === fn).reduce((s,rr)=>s+(parseFloat(rr['Adjust GP2'])||0),0);
+      return fa !== 0 || fb !== 0;
+    });
+    const hasMultiFn = visibleFns.length > 1;
+    
+    // If Function filter is active, check if this client has matching function
+    const fnListMatches = !fnFilter || fnFilter === 'all' || r.fnList.includes(fnFilter);
+    if(!fnListMatches) return; // Skip this client if function filter doesn't match
+    
+    // If Function filter is active, only show parent row if single function or function filter is 'all'
+    const showParent = !fnFilter || fnFilter === 'all';
+    
+    if(showParent) {
+      sectionDetailsHtml += `<tr data-client-key="${safeKey}" onclick="toggleClientRow(this, '${safeKey}')" style="cursor:pointer;">
+        <td><span id="chev_client_${safeKey}" style="display:inline-block;width:14px;margin-right:6px;transition:transform 0.15s;visibility:${hasMultiFn?'visible':'hidden'}">▶</span>${r.k} ${typeBadge}</td>
+        <td>${r.bu}</td><td>${r.pod}</td><td>${r.fn || 'N/A'}</td>
+        <td class="week-a-col">${fmtM(r.ga)}</td><td class="week-b-col">${fmtM(r.gb)}</td>
+        <td class="${varClass(r.v)}">${r.v>=0?'+':''}${fmtM(r.v)}</td>
+        <td class="${varClass(r.p)}">${fmtPct(r.p)}</td>
+      </tr>`;
+      typeTotals[r.type].ga += r.ga;
+      typeTotals[r.type].gb += r.gb;
+      typeTotals[r.type].v += r.v;
+    } else {
+      // If function filter is active and parent is hidden, show function detail rows for matching functions
+      const matchingFns = r.fnList.filter(fn => fnFilter === fn);
+      matchingFns.forEach(fn => {
+        const fa = filterQ(wkAData).filter(rr => buildClientKey(rr) === r.k && rr['Fin Function'] === fn).reduce((s,rr)=>s+(parseFloat(rr['Adjust GP2'])||0),0);
+        const fb = filterQ(wkBData).filter(rr => buildClientKey(rr) === r.k && rr['Fin Function'] === fn).reduce((s,rr)=>s+(parseFloat(rr['Adjust GP2'])||0),0);
+        if(fa === 0 && fb === 0) return;
+        const fv = fb-fa;
+        const fp = fa?fv/fa:0;
+        sectionDetailsHtml += `<tr style="background:var(--surface2)">
+          <td style="padding-left:28px;color:var(--text2)">${r.k}</td>
+          <td>${r.bu}</td><td>${r.pod}</td><td>${fn}</td>
+          <td class="week-a-col">${fmtM(fa)}</td><td class="week-b-col">${fmtM(fb)}</td>
+          <td class="${varClass(fv)}">${fv>=0?'+':''}${fmtM(fv)}</td>
+          <td class="${varClass(fp)}">${fmtPct(fp)}</td>
+        </tr>`;
+        typeTotals[r.type].ga += fa;
+        typeTotals[r.type].gb += fb;
+        typeTotals[r.type].v += fv;
+      });
+    }
+    
+    if(showParent && r.fnList.length > 1) {
+      r.fnList.forEach(fn => {
+        const fa = filterQ(wkAData).filter(rr => buildClientKey(rr) === r.k && rr['Fin Function'] === fn).reduce((s,rr)=>s+(parseFloat(rr['Adjust GP2'])||0),0);
+        const fb = filterQ(wkBData).filter(rr => buildClientKey(rr) === r.k && rr['Fin Function'] === fn).reduce((s,rr)=>s+(parseFloat(rr['Adjust GP2'])||0),0);
+        if(fa === 0 && fb === 0) return;
+        
+        const fv = fb-fa;
+        const fp = fa?fv/fa:0;
+        sectionDetailsHtml += `<tr class="client-fn-${safeKey}" style="display:none;background:var(--surface2)">
+          <td style="padding-left:28px;color:var(--text2)">${r.k}</td>
+          <td>${r.bu}</td><td>${r.pod}</td><td>${fn}</td>
+          <td class="week-a-col">${fmtM(fa)}</td><td class="week-b-col">${fmtM(fb)}</td>
+          <td class="${varClass(fv)}">${fv>=0?'+':''}${fmtM(fv)}</td>
+          <td class="${varClass(fp)}">${fmtPct(fp)}</td>
+        </tr>`;
+      });
+    }
   });
+  
+  flushSection(lastType);
 
   document.getElementById('client-table').innerHTML = `
-    <thead><tr><th>Client</th><th>BU</th><th>Pod Director</th><th>${fmtDate(a)}</th><th>${fmtDate(b)}</th><th>Var (M)</th><th>Var%</th></tr></thead>
-    <tbody>${html || '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:24px">Không có kết quả</td></tr>'}</tbody>`;
+    <thead><tr><th>Client</th><th>BU</th><th>Pod Director</th><th>Function</th><th class="week-a-header">${fmtDate(a)}</th><th class="week-b-header">${fmtDate(b)}</th><th>Var (M)</th><th>Var%</th></tr></thead>
+    <tbody>${html || '<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:24px">Không có kết quả</td></tr>'}</tbody>`;
+}
+
+function populateClientFilters(rows) {
+  const buSet = new Set();
+  const podSet = new Set();
+  const fnSet = new Set();
+  rows.forEach(r => {
+    r.bu.split(', ').forEach(v => { if(v) buSet.add(v); });
+    if(r.pod) podSet.add(r.pod);
+    r.fnList.forEach(fn => { if(fn) fnSet.add(fn); });
+  });
+  const buSel = document.getElementById('client-bu-filter');
+  const podSel = document.getElementById('client-pod-filter');
+  const fnSel = document.getElementById('client-fn-filter');
+  if(!buSel || !fnSel || !podSel) return;
+  const currentBU = buSel.value || 'all';
+  const currentPod = podSel.value || 'all';
+  const currentFn = fnSel.value || 'all';
+  buSel.innerHTML = '<option value="all">All BU</option>' + [...buSet].sort().map(v => `<option value="${v}">${v}</option>`).join('');
+  podSel.innerHTML = '<option value="all">All Pod Director</option>' + [...podSet].sort().map(v => `<option value="${v}">${v}</option>`).join('');
+  fnSel.innerHTML = '<option value="all">All Function</option>' + [...fnSet].sort().map(v => `<option value="${v}">${v}</option>`).join('');
+  if([...'all', ...buSet].includes(currentBU)) buSel.value = currentBU;
+  if([...'all', ...podSet].includes(currentPod)) podSel.value = currentPod;
+  if([...'all', ...fnSet].includes(currentFn)) fnSel.value = currentFn;
+}
+
+function toggleClientRow(row, key) {
+  const rows = document.querySelectorAll('.client-fn-' + key);
+  if(!rows.length) return;
+  const isOpen = rows[0].style.display !== 'none';
+  rows.forEach(r => r.style.display = isOpen ? 'none' : '');
+  const chev = document.getElementById('chev_client_' + key);
+  if(chev) chev.style.transform = isOpen ? '' : 'rotate(90deg)';
 }
 
 function setClientType(t) {
@@ -1305,7 +1575,7 @@ function switchTab(i) {
 }
 
 // ── GP3 DATA ───────────────────────────────────────────────────────────────
-const GP3_URL = 'https://sheetdb.io/api/v1/0uhjrk599cplw?sheet=Gap_master_data_gp3';
+const GP3_URL = 'https://sheetdb.io/api/v1/k62qf71nx5a1r?sheet=Gap_master_data_gp3';
 let gp3RawData = [];
 let gp3WeekA = [], gp3WeekB = [];
 let gp3CurrentView = 0;
@@ -1578,87 +1848,6 @@ function switchGP3CompDim(i) {
   gp3CurrentCompDim = i;
   document.querySelectorAll('#gp3-view-1 .sub-tab').forEach((t,j) => t.classList.toggle('active', i===j));
   renderGP3Comp();
-}
-
-// ── AI SUMMARY ────────────────────────────────────────────────────────────
-async function generateAISummary() {
-  const btn = document.getElementById('ai-btn');
-  const box = document.getElementById('ai-summary-box');
-  btn.disabled = true;
-  btn.textContent = 'Dang phan tich...';
-  box.style.display = 'block';
-  box.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:16px;color:var(--text2);font-size:13px"><div class="spinner"></div> ChatGPT đang đọc data và tạo insights...</div>';
-
-  const a = document.getElementById('weekA').value;
-  const b = document.getElementById('weekB').value;
-
-  const fyA = sumGP(filterQ(wkAData),'GP2');
-  const fyB = sumGP(filterQ(wkBData),'GP2');
-  const fyVar = fyB-fyA;
-  const fyPct = fyA?(fyVar/fyA*100).toFixed(1):0;
-
-  const podA = groupSum(filterQ(wkAData),'Pod Director','GP2');
-  const podB = groupSum(filterQ(wkBData),'Pod Director','GP2');
-  const podLines = [...new Set([...Object.keys(podA),...Object.keys(podB)])]
-    .map(function(k){const v=(podB[k]||0)-(podA[k]||0); return '- '+k+': '+(podA[k]||0).toFixed(0)+'M -> '+(podB[k]||0).toFixed(0)+'M ('+(v>=0?'+':'')+v.toFixed(0)+'M)';})
-    .join('\n');
-
-  const buA = groupSum(filterQ(wkAData),'BU','GP2');
-  const buB = groupSum(filterQ(wkBData),'BU','GP2');
-  const buLines = [...new Set([...Object.keys(buA),...Object.keys(buB)])]
-    .map(function(k){const v=(buB[k]||0)-(buA[k]||0); return '- '+k+': '+(buA[k]||0).toFixed(0)+'M -> '+(buB[k]||0).toFixed(0)+'M ('+(v>=0?'+':'')+v.toFixed(0)+'M)';})
-    .join('\n');
-
-  const dA=filterQ(wkAData), dB=filterQ(wkBData);
-  const mA={},mB={};
-  dA.forEach(function(r){const k=buildClientKey(r);mA[k]=(mA[k]||0)+(parseFloat(r.GP2)||0);});
-  dB.forEach(function(r){const k=buildClientKey(r);mB[k]=(mB[k]||0)+(parseFloat(r.GP2)||0);});
-  const allK=[...new Set([...Object.keys(mA),...Object.keys(mB)])];
-  const lost=[],gained=[],scaleDown=[],scaleUp=[];
-  allK.forEach(function(k){
-    const ga=mA[k]||0,gb=mB[k]||0;
-    if(ga===0&&gb===0)return;
-    if(ga===0)gained.push({k:k,v:gb});
-    else if(gb===0)lost.push({k:k,v:-ga});
-    else if(gb>ga)scaleUp.push({k:k,v:gb-ga});
-    else scaleDown.push({k:k,v:gb-ga});
-  });
-  const top3=function(arr,asc){return [...arr].sort(function(a,b){return asc?a.v-b.v:b.v-a.v;}).slice(0,3).map(function(c){return c.k+' ('+fmtM(c.v)+'M)';}).join(', ');};
-
-  const prompt = 'Ban la senior business analyst tai PMAX. Phan tich data sau va viet executive summary + action items bang tieng Viet, ngan gon, actionable.\n\n'
-    + 'SO SANH: ' + fmtDate(a) + ' vs ' + fmtDate(b) + ' - ' + getQLabel() + '\n\n'
-    + 'GP2: WeekA=' + fyA.toFixed(0) + 'M, WeekB=' + fyB.toFixed(0) + 'M, Var=' + (fyVar>=0?'+':'') + fyVar.toFixed(0) + 'M (' + fyPct + '%)\n\n'
-    + 'POD:\n' + podLines + '\n\nBU:\n' + buLines + '\n\n'
-    + 'CLIENTS: Lost(' + lost.length + '): ' + top3(lost,true) + ' | New(' + gained.length + '): ' + top3(gained,false) + ' | Scale-down(' + scaleDown.length + '): ' + top3(scaleDown,true) + '\n\n'
-    + 'Tra ve JSON thuan (khong markdown):\n{"weekLabel":"WW__ (DD Mon YYYY)","execSummary":{"col1":"2-3 cau GP2 performance","col2":"2-3 cau POD performance"},"highlights":{"redFlag":"van de nghiem trong nhat","brightSpot":"diem sang"},"insights":[{"title":"tieu de","content":"2-3 cau"},{"title":"tieu de","content":"2-3 cau"},{"title":"tieu de","content":"2-3 cau"},{"title":"tieu de","content":"2-3 cau"}],"actionItems":[{"priority":"P0 - CRITICAL","level":"p0","content":"action"},{"priority":"P0 - CRITICAL","level":"p0","content":"action"},{"priority":"P1 - HIGH","level":"p1","content":"action"},{"priority":"P1 - HIGH","level":"p1","content":"action"},{"priority":"P2 - GROWTH","level":"p2","content":"action"}]}';
-
-  // ── Thay YOUR_GAS_PROXY_URL bằng URL Web App sau khi deploy Apps Script ──
-  const PROXY_URL = 'https://script.google.com/a/macros/pmax.com.vn/s/AKfycbxg6XIvzH8t2bhDfqPCP8SOjF9WKC2K0-rf65ZuvXCdAj_5wATAiEECw91FP533r5z8/exec';
-
-  try {
-    const resp = await fetch(PROXY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] })
-    });
-    const data = await resp.json();
-    const text = (data.choices[0].message.content).replace(/```json|```/g,'').trim();
-    const ai = JSON.parse(text);
-    box.innerHTML =
-      '<div class="ai-exec"><h3>Executive Summary - ' + ai.weekLabel + '</h3>'
-      + '<div class="ai-exec-row"><div class="ai-exec-col"><p>' + ai.execSummary.col1 + '</p></div><div class="ai-exec-col"><p>' + ai.execSummary.col2 + '</p></div></div>'
-      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px"><p style="font-size:12px;color:#fbbf24"><strong>Red Flag:</strong> ' + ai.highlights.redFlag + '</p><p style="font-size:12px;color:#4ade80"><strong>Bright Spot:</strong> ' + ai.highlights.brightSpot + '</p></div></div>'
-      + '<div class="card" style="margin-bottom:12px"><div class="card-title" style="margin-bottom:10px">Action Items - Week of ' + fmtDate(b) + '</div><div class="ai-action-grid">'
-      + ai.actionItems.map(function(x){return '<div class="ai-action-item '+x.level+'"><div class="pri">'+x.priority+'</div><p>'+x.content+'</p></div>';}).join('')
-      + '</div></div><div class="ai-insights">'
-      + ai.insights.map(function(x){return '<div class="ai-insight"><div class="ititle">'+x.title+'</div><p>'+x.content+'</p></div>';}).join('')
-      + '</div>';
-    btn.textContent = 'Regenerate';
-  } catch(e) {
-    box.innerHTML = '<div style="color:var(--red);padding:16px;font-size:13px">Loi: ' + e.message + '</div>';
-    btn.textContent = 'Generate AI Insights';
-  }
-  btn.disabled = false;
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
