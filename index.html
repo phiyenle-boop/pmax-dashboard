@@ -154,6 +154,19 @@ tr:hover td { background: var(--surface2); }
 .dq-stat:last-child { border-bottom: none; }
 .dq-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
+/* KPI */
+.kpi-bar-wrap { margin-top: 14px; }
+.kpi-bar { position: relative; height: 10px; background: var(--surface2); border-radius: 20px; overflow: hidden; }
+.kpi-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 20px; transition: width 0.3s; }
+.kpi-bar-legend { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-top: 6px; }
+#kpi-bd-table th.kpi-col, #kpi-bd-table td.kpi-col { color: #12437f; }
+#kpi-bd-table td.kpi-col { font-weight: 600; }
+#kpi-bd-table th:first-child, #kpi-bd-table td:first-child { white-space: normal; word-break: break-word; }
+.kpi-note { margin-top: 12px; font-size: 12px; color: var(--text2); line-height: 1.7; }
+.kpi-note b { color: var(--text); }
+.kpi-warn { color: var(--amber); }
+.badge-purple { background: #f4f1ff; color: #5b3fbf; }
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .controls { gap: 10px; }
@@ -233,6 +246,10 @@ tr:hover td { background: var(--surface2); }
 
   <!-- VIEW 0: OVERVIEW -->
   <div class="view" id="view-0">
+    <div class="card" id="overview-kpi-card">
+      <div class="card-title" id="overview-kpi-title">KPI Tracking</div>
+      <div id="overview-kpi-body"></div>
+    </div>
     <div class="metric-grid" id="overview-metrics" style="display:block"></div>
     <div class="card">
       <div class="card-title">Quarterly Summary</div>
@@ -294,6 +311,11 @@ tr:hover td { background: var(--surface2); }
       <div class="sub-tab" onclick="switchBreakdown(3)">Solution</div>
       <div class="sub-tab" onclick="switchBreakdown(4)">Vertical</div>
       <div class="sub-tab" onclick="switchBreakdown(5)">Detail</div>
+    </div>
+    <div class="card" id="kpi-bd-card">
+      <div class="card-title" id="kpi-bd-title">KPI Tracking</div>
+      <div class="table-wrap"><table id="kpi-bd-table"></table></div>
+      <div class="kpi-note" id="kpi-bd-note"></div>
     </div>
     <div class="card" id="bd-q2-card">
       <div class="card-title" id="bd-q2-title">Q2 — GP2 vs GP2 new_new</div>
@@ -359,6 +381,10 @@ tr:hover td { background: var(--surface2); }
       <div id="dq-overview"></div>
     </div>
     <div class="card">
+      <div class="card-title">KPI Data Diagnostics</div>
+      <div id="dq-kpi"></div>
+    </div>
+    <div class="card">
       <div class="card-title" id="dq-wkA-title">Week A — Missing Client Name</div>
       <div class="table-wrap"><table id="dq-wkA-table"></table></div>
     </div>
@@ -411,6 +437,11 @@ async function fetchFreshData() {
   localStorage.removeItem(CACHE_KEY);
   localStorage.removeItem(CACHE_KEY_GP3);
   localStorage.removeItem(CACHE_TS_KEY);
+  localStorage.removeItem(CACHE_KEY_KPI);
+  localStorage.removeItem(CACHE_KEY_KPITH);
+  gp3RawData = [];
+  kpiRawData = []; kpiCols = null; kpiStatusMsg = ''; kpiThFromSheet = false;
+  kpiThresholds = DEFAULT_KPI_TH.slice();
   await loadData();
 }
 
@@ -432,6 +463,7 @@ async function loadData() {
     const cached = localStorage.getItem(CACHE_KEY);
     if(cached) {
       rawData = JSON.parse(cached);
+      await loadKPI();
       processData();
       document.getElementById('loading').style.display = 'none';
       document.querySelectorAll('.view')[0].classList.add('active');
@@ -450,6 +482,8 @@ async function loadData() {
     const KEEP_COLS = ['Log_date','Month','Quarter','Year','BU','Client Name','Client Code','Pod Director','Fin Function','Fin Solution','Fin Vertical','GP2','GP2 new_new','Adjust GP2'];
     const slimData = rawData.map(r => { const o={}; KEEP_COLS.forEach(k=>{ if(r[k]!==undefined) o[k]=r[k]; }); return o; });
     try { localStorage.setItem(CACHE_KEY, JSON.stringify(slimData)); localStorage.setItem(CACHE_TS_KEY, Date.now().toString()); } catch(e) { console.warn('Cache save failed:', e); }
+    setStatus('Đang tải KPI...', '');
+    await loadKPI();
     processData();
     document.getElementById('loading').style.display = 'none';
     document.querySelectorAll('.view')[0].classList.add('active');
@@ -776,6 +810,8 @@ function renderOverview() {
     const gb = sumGP(filteredB.filter(r=>parseInt(r.Quarter)===q),'GP2') + sumGP(filteredB.filter(r=>parseInt(r.Quarter)===q),'GP2 new_new');
     return {q, v:gb-ga, p:ga?(gb-ga)/ga:0};
   }).sort((a,b)=>a.v-b.v)[0];
+  renderOverviewKPI();
+
   document.getElementById('overview-finding').innerHTML = `<strong>🔑 Key Finding:</strong> Full Year Total GP2 variance <span class="${varClass(totalVar)}">${totalVar>=0?'+':''}${fmtM(totalVar)}M (${(totalPct*100).toFixed(1)}%)</span>. Quarter có biến động lớn nhất: <b>Q${topQ.q}</b> <span class="${varClass(topQ.v)}">(${topQ.v>=0?'+':''}${fmtM(topQ.v)}M, ${(topQ.p*100).toFixed(1)}%)</span>.`;
 }
 
@@ -940,6 +976,7 @@ function renderBreakdown() {
     renderBDTable('bd-fy-table', wkAData, wkBData, dim, a, b);
   }
   if(isDetail) renderBUDetailTable();
+  renderKPIBreakdown();
 }
 
 function switchBUDetail(i) {
@@ -1563,6 +1600,538 @@ function renderDataQuality() {
       <thead><tr><th>Client Code</th><th>BU</th><th>Số dòng</th><th>GP2 (M)</th><th>Remark</th></tr></thead>
       <tbody>${tableRows}</tbody>`;
   });
+
+  renderKPIDiag();
+}
+
+// ── KPI TRACKING ───────────────────────────────────────────────────────────
+const KPI_URL    = 'https://sheetdb.io/api/v1/q0i7o0mrmiymz?sheet=kpi_master_data';
+const KPI_TH_URL = 'https://sheetdb.io/api/v1/q0i7o0mrmiymz?sheet=kpi_threshold';
+const CACHE_KEY_KPI   = 'pmax_kpidata';
+const CACHE_KEY_KPITH = 'pmax_kpi_threshold';
+// Sheet KPI chỉ có cột Month (1–12), không có Year → giả định toàn bộ KPI thuộc năm này
+const KPI_YEAR = 2026;
+
+let kpiRawData = [];
+let kpiCols = null;
+let kpiStatusMsg = '';
+let kpiThFromSheet = false;
+
+// Ngưỡng badge mặc định — dùng khi sheet kpi_threshold chưa tồn tại / lỗi
+const DEFAULT_KPI_TH = [
+  {min: 100, label: 'On track', emoji: '🟢', color: 'green'},
+  {min: 95,  label: 'At risk',  emoji: '🟡', color: 'yellow'},
+  {min: 85,  label: 'Behind',   emoji: '🟠', color: 'orange'},
+  {min: -1e9,label: 'Critical', emoji: '🔴', color: 'red'}
+];
+let kpiThresholds = DEFAULT_KPI_TH.slice();
+
+// Tên cột sheet KPI — dò nhiều biến thể để không phụ thuộc chính tả header
+const KPI_COL_CANDIDATES = {
+  month:   ['Month','month','month_id','Month ID','Thang','Tháng'],
+  bu:      ['BU','Business Unit','BU Name'],
+  podcode: ['POD Code','Pod Code','POD_Code'],
+  pod:     ['POD Director','Pod Director','POD Director Name','Director','POD Leader','POD'],
+  client:  ['Client name','Client Name','Client','Client_Name'],
+  fn:      ['Function','Fin Function','new_coe','COE'],
+  sol:     ['Solution','Fin Solution'],
+  vert:    ['Vertical','Fin Vertical'],
+  kpi:     ['GP2 KPI','KPI GP2','GP2_KPI','GP2 Kpi','KPI']
+};
+// Các field bắt buộc phải là cột chữ — dùng để loại cột toàn số (POD Code bị nhận nhầm thành POD Director...)
+const KPI_TEXT_FIELDS = ['bu','pod','fn','sol','vert','client'];
+// Ghi đè thủ công khi resolver vẫn bắt sai: điền đúng tên header trong sheet, vd pod: 'POD Director'
+const KPI_COL_OVERRIDE = {
+  // pod: 'POD Director',
+};
+const KPI_COL_REQUIRED = {month:'Month', bu:'BU', pod:'POD Director', fn:'Function', sol:'Solution', vert:'Vertical', kpi:'GP2 KPI'};
+// Khớp index với BD_DIMS / BD_LABELS (0..4)
+const KPI_DIM_FIELDS = ['pod','bu','fn','sol','vert'];
+
+function nkey(s) { return String(s == null ? '' : s).toLowerCase().trim().replace(/[\s_\-\.]/g,''); }
+function parseNum(v) { if(v === null || v === undefined || v === '') return 0; return parseFloat(String(v).replace(/,/g,'')) || 0; }
+
+function resolveKpiCols(rows) {
+  const keys = new Set();
+  rows.slice(0, 50).forEach(r => Object.keys(r).forEach(k => keys.add(k)));
+  const keyArr = [...keys];
+  const sample = rows.slice(0, 80);
+
+  // Tỷ lệ giá trị là chữ (không phải số) của 1 cột
+  const textRatio = (k) => {
+    let txt = 0, tot = 0;
+    sample.forEach(r => {
+      const v = r[k];
+      if(v === '' || v == null) return;
+      tot++;
+      if(!/^-?[\d.,\s]+$/.test(String(v).trim())) txt++;
+    });
+    return tot ? txt / tot : 0;
+  };
+
+  const map = {__all: keyArr, __rejected: {}, __sample: {}};
+  keyArr.forEach(k => {
+    const vals = [];
+    for(let i = 0; i < sample.length && vals.length < 3; i++) {
+      const v = sample[i][k];
+      if(v !== '' && v != null) vals.push(String(v));
+    }
+    map.__sample[k] = vals;
+  });
+
+  Object.keys(KPI_COL_CANDIDATES).forEach(f => {
+    if(KPI_COL_OVERRIDE[f] && keyArr.indexOf(KPI_COL_OVERRIDE[f]) >= 0) { map[f] = KPI_COL_OVERRIDE[f]; return; }
+    map[f] = null;
+    const needText = KPI_TEXT_FIELDS.indexOf(f) >= 0;
+    // Dò theo đúng thứ tự ưu tiên của danh sách candidate
+    for(let i = 0; i < KPI_COL_CANDIDATES[f].length; i++) {
+      const cand = nkey(KPI_COL_CANDIDATES[f][i]);
+      const hit = keyArr.find(k => nkey(k) === cand);
+      if(!hit) continue;
+      if(needText && textRatio(hit) < 0.5) {
+        map.__rejected[f] = map.__rejected[f] || [];
+        if(map.__rejected[f].indexOf(hit) < 0) map.__rejected[f].push(hit);
+        continue;
+      }
+      map[f] = hit;
+      break;
+    }
+    // Chưa ra thì dò khớp một phần, nhưng vẫn bắt buộc là cột chữ
+    if(!map[f] && needText) {
+      const kw = KPI_COL_CANDIDATES[f].map(nkey);
+      const hit = keyArr.find(k => kw.some(c => nkey(k).indexOf(c) >= 0 || c.indexOf(nkey(k)) >= 0) && textRatio(k) >= 0.5);
+      if(hit) map[f] = hit;
+    }
+  });
+  return refineKpiColsByValues(rows, map);
+}
+
+// Cột dimension tương ứng ở sheet forecast
+const FC_DIM_FOR = {bu:'BU', pod:'Pod Director', fn:'Fin Function', sol:'Fin Solution', vert:'Fin Vertical', client:'Client Name'};
+
+// Dò cột theo GIÁ TRỊ: chọn cột nào của sheet KPI trùng nhiều giá trị nhất với cột tương ứng
+// ở sheet forecast. Cách này không phụ thuộc tên header nên không bị bắt nhầm cột mã số.
+function refineKpiColsByValues(rows, map) {
+  map.__auto = {}; map.__overlap = {};
+  if(!rawData || !rawData.length) return map;
+  const sample = rows.length > 3000 ? rows.slice(0, 3000) : rows;
+  const colVals = {};
+  map.__all.forEach(k => {
+    const s = new Set();
+    sample.forEach(r => { const v = r[k]; if(v !== '' && v != null) s.add(nkey(v)); });
+    colVals[k] = s;
+  });
+
+  Object.keys(FC_DIM_FOR).forEach(f => {
+    const fcSet = new Set();
+    rawData.forEach(r => { const v = r[FC_DIM_FOR[f]]; if(v !== '' && v != null) fcSet.add(nkey(v)); });
+    if(!fcSet.size) return;
+    const score = (k) => {
+      if(!k || !colVals[k]) return 0;
+      let n = 0;
+      colVals[k].forEach(v => { if(fcSet.has(v)) n++; });
+      return n;
+    };
+    const cur = map[f];
+    const curScore = score(cur);
+    let best = cur, bestScore = curScore;
+    map.__all.forEach(k => { const sc = score(k); if(sc > bestScore) { best = k; bestScore = sc; } });
+    map.__overlap[f] = {col: cur, matched: curScore, total: fcSet.size, best: best, bestMatched: bestScore};
+    // Chỉ cứu khi cột theo header khớp 0 giá trị mà có cột khác khớp đáng kể
+    // (trường hợp sheet có 2 cột trùng tên nên SheetDB trả về cột sai)
+    const enough = bestScore >= Math.max(3, Math.floor(fcSet.size * 0.2));
+    if(best !== cur && curScore === 0 && enough) {
+      map.__auto[f] = {from: cur, to: best, matched: bestScore, total: fcSet.size};
+      map[f] = best;
+    }
+  });
+  return map;
+}
+
+function parseThresholds(rows) {
+  if(!rows || !rows.length) return null;
+  const keys = Object.keys(rows[0] || {});
+  const col = (cands) => keys.find(k => cands.includes(nkey(k)));
+  const cMin = col(['minpct','min','min%','minach','minachpct','threshold','from','tu']);
+  if(!cMin) return null;
+  const cLabel = col(['label','status','name','nhan','trangthai']);
+  const cEmoji = col(['emoji','icon','bieutuong']);
+  const cColor = col(['color','colour','mau']);
+  const out = rows.map(r => ({
+    min:   parseNum(r[cMin]),
+    label: String((cLabel ? r[cLabel] : '') || '').trim() || '—',
+    emoji: String((cEmoji ? r[cEmoji] : '') || '').trim(),
+    color: String((cColor ? r[cColor] : '') || 'neutral').trim() || 'neutral'
+  })).filter(t => isFinite(t.min));
+  if(!out.length) return null;
+  return out.sort((a,b) => b.min - a.min);
+}
+
+async function loadKPI() {
+  // 1) Ngưỡng badge
+  try {
+    let thRows = null;
+    const cth = localStorage.getItem(CACHE_KEY_KPITH);
+    if(cth) thRows = JSON.parse(cth);
+    else {
+      const r = await fetch(KPI_TH_URL + '&limit=999');
+      if(r.ok) {
+        const j = await r.json();
+        // Chỉ cache khi đúng là mảng — sheet chưa tồn tại thì SheetDB trả về object lỗi
+        if(Array.isArray(j)) { thRows = j; try { localStorage.setItem(CACHE_KEY_KPITH, JSON.stringify(j)); } catch(e) {} }
+      }
+    }
+    const parsed = parseThresholds(thRows);
+    if(parsed) { kpiThresholds = parsed; kpiThFromSheet = true; }
+  } catch(e) { console.warn('kpi_threshold → dùng ngưỡng mặc định:', e); }
+
+  // 2) Data KPI
+  try {
+    const c = localStorage.getItem(CACHE_KEY_KPI);
+    if(c) kpiRawData = JSON.parse(c);
+    else {
+      const r = await fetch(KPI_URL + '&limit=999999');
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      const j = await r.json();
+      if(!Array.isArray(j)) throw new Error('sheet kpi_master_data không tồn tại hoặc SheetDB trả về lỗi');
+      kpiRawData = j;
+      try { localStorage.setItem(CACHE_KEY_KPI, JSON.stringify(kpiRawData)); } catch(e) { console.warn('KPI cache save failed:', e); }
+    }
+    kpiCols = kpiRawData.length ? resolveKpiCols(kpiRawData) : null;
+    kpiStatusMsg = kpiRawData.length ? '' : 'Sheet kpi_master_data không có dòng nào';
+    if(kpiCols && !kpiCols.kpi) kpiStatusMsg = 'Không tìm thấy cột "GP2 KPI" trong sheet kpi_master_data';
+  } catch(e) {
+    kpiRawData = []; kpiCols = null;
+    kpiStatusMsg = 'Không tải được sheet kpi_master_data (' + e.message + ')';
+  }
+}
+
+const MONTH_NUM_MAP = {jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+
+function kpiMonth(r) {
+  if(!kpiCols || !kpiCols.month) return 0;
+  const s = String(r[kpiCols.month] == null ? '' : r[kpiCols.month]).trim();
+  if(s.includes('-')) { const p = s.split('-'); return parseInt(p[1]) || MONTH_NUM_MAP[String(p[1]).slice(0,3).toLowerCase()] || 0; }
+  if(s.includes('/')) { const p = s.split('/'); return parseInt(p[1]) || 0; }
+  const mn = MONTH_NUM_MAP[s.slice(0,3).toLowerCase()];
+  if(mn) return mn;
+  return parseInt(s) || 0;
+}
+
+// KPI không có cột Year → chỉ áp filter Quarter/Month, và chặn khi chọn năm khác KPI_YEAR
+function kpiYearMismatch() { const y = getYear(); return y > 0 && y !== KPI_YEAR; }
+// Chọn Năm = "Tất cả" thì forecast gộp nhiều năm nhưng KPI chỉ có 1 năm → Ach% không so được
+function kpiYearWarn() {
+  return getYear() === 0
+    ? '<div class="kpi-warn">⚠️ Đang chọn Năm = "Tất cả": forecast gộp mọi năm nhưng KPI chỉ thuộc năm ' + KPI_YEAR + ' → Ach% bị phóng đại. Chọn Năm = ' + KPI_YEAR + ' để so đúng.</div>'
+    : '';
+}
+
+function filterKPIRows() {
+  if(!kpiRawData.length || !kpiCols || kpiYearMismatch()) return [];
+  const q = getQ(), m = getM();
+  let r = kpiRawData;
+  if(q > 0) { const ms = QTR_MONTHS[q] || []; r = r.filter(x => ms.includes(kpiMonth(x))); }
+  if(m > 0) r = r.filter(x => kpiMonth(x) === m);
+  return r;
+}
+
+function kpiTotal(rows) {
+  if(!kpiCols || !kpiCols.kpi) return 0;
+  return rows.reduce((s,r) => s + parseNum(r[kpiCols.kpi]), 0);
+}
+
+// Gom KPI theo 1 dimension. Key = chuẩn hoá (bỏ hoa/thường, khoảng trắng) để join được với sheet forecast
+function kpiByDim(rows, field) {
+  const out = {};
+  if(!kpiCols) return out;
+  const col = kpiCols[field], kcol = kpiCols.kpi;
+  if(!col || !kcol) return out;
+  rows.forEach(r => {
+    const raw = (r[col] === '' || r[col] == null) ? 'N/A' : String(r[col]).trim();
+    const k = nkey(raw);
+    if(!out[k]) out[k] = {label: raw, val: 0};
+    out[k].val += parseNum(r[kcol]);
+  });
+  return out;
+}
+
+// Total GP2 = GP2 + GP2 new_new, gom theo dimension của sheet forecast
+function totalGP2ByDim(rows, dimField) {
+  const out = {};
+  rows.forEach(r => {
+    const raw = (r[dimField] === '' || r[dimField] == null) ? 'N/A' : String(r[dimField]).trim();
+    const k = nkey(raw);
+    if(!out[k]) out[k] = {label: raw, val: 0};
+    out[k].val += (parseFloat(r['GP2']) || 0) + (parseFloat(r['GP2 new_new']) || 0);
+  });
+  return out;
+}
+
+function kpiBucket(ach) {
+  if(ach === null || ach === undefined || !isFinite(ach)) return null;
+  const p = ach * 100;
+  return kpiThresholds.find(t => p >= t.min) || kpiThresholds[kpiThresholds.length - 1];
+}
+
+function kpiBadge(ach) {
+  const t = kpiBucket(ach);
+  if(!t) return '<span class="badge badge-neutral">⚪ Chưa có KPI</span>';
+  const txt = (t.emoji ? t.emoji + ' ' : '') + t.label;
+  if(t.color.charAt(0) === '#') return '<span class="badge" style="background:' + t.color + '1f;color:' + t.color + '">' + txt + '</span>';
+  return '<span class="badge badge-' + t.color + '">' + txt + '</span>';
+}
+
+function kpiColor(ach) {
+  const t = kpiBucket(ach);
+  if(!t) return 'var(--text3)';
+  if(t.color.charAt(0) === '#') return t.color;
+  const m = {green:'var(--green)', red:'var(--red)', orange:'#b35c00', amber:'var(--amber)', yellow:'#8a6d00', neutral:'var(--text3)'};
+  return m[t.color] || 'var(--accent)';
+}
+
+function fmtPP(v) { if(v == null || !isFinite(v)) return '–'; return (v >= 0 ? '+' : '') + v.toFixed(1) + 'pp'; }
+// Số làm tròn, không phần thập phân (chỉ % mới giữ 1 số thập phân)
+function fmtM0(v) {
+  if(v == null || isNaN(v)) return '–';
+  const n = Math.round(+v) || 0;
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+function fmtSigned0(v) { if(v == null || isNaN(v)) return '–'; const n = Math.round(+v) || 0; return n === 0 ? '0' : (n > 0 ? '+' : '') + fmtM0(n); }
+
+// ── KPI: dải card cấp Corp (tab Overview) ─────────────────────────────────
+function renderOverviewKPI() {
+  const el = document.getElementById('overview-kpi-body');
+  if(!el) return;
+  const titleEl = document.getElementById('overview-kpi-title');
+  const b = document.getElementById('weekB').value;
+  if(titleEl) titleEl.textContent = 'KPI Tracking — ' + getQLabel() + ' · Total GP2 (GP2 + new_new) vs GP2 KPI';
+
+  if(!kpiRawData.length || !kpiCols || !kpiCols.kpi) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--red)">' + (kpiStatusMsg || 'Chưa có dữ liệu KPI') + '</div>';
+    return;
+  }
+  if(kpiYearMismatch()) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text2)">Sheet KPI chỉ có cột Month (1–12) nên toàn bộ KPI được coi là của năm <b>' + KPI_YEAR + '</b>. Chọn Năm = ' + KPI_YEAR + ' hoặc "Tất cả" để xem KPI.</div>';
+    return;
+  }
+
+  const kpi = kpiTotal(filterKPIRows());
+  const fA = filterQ(wkAData), fB = filterQ(wkBData);
+  const ta = sumGP(fA,'GP2') + sumGP(fA,'GP2 new_new');
+  const tb = sumGP(fB,'GP2') + sumGP(fB,'GP2 new_new');
+  const gap = tb - kpi;
+  const ach  = kpi ? tb / kpi : null;
+  const achA = kpi ? ta / kpi : null;
+  const dpp  = (ach != null && achA != null) ? (ach - achA) * 100 : null;
+  const col = kpiColor(ach);
+  const pctW = ach != null ? Math.max(0, Math.min(100, ach * 100)) : 0;
+
+  const card = (lbl, val, sub, color) => '<div class="metric-card"><div class="metric-label">' + lbl + '</div>' +
+    '<div class="metric-value"' + (color ? ' style="color:' + color + '"' : '') + '>' + val + '</div>' +
+    '<div class="metric-sub" style="color:' + (color || 'var(--text3)') + '">' + sub + '</div></div>';
+
+  el.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">' +
+      card('GP2 KPI', fmtM0(kpi), 'M VNĐ · ' + getQLabel()) +
+      card('Forecast ' + fmtDate(b), fmtM0(tb), 'Total GP2 (M VNĐ)') +
+      card('Gap vs KPI', fmtSigned0(gap), gap >= 0 ? 'vượt KPI' : 'còn thiếu', gap >= 0 ? 'var(--green)' : 'var(--red)') +
+      card('Achievement', ach != null ? (ach * 100).toFixed(1) + '%' : '–', kpiBadge(ach), col) +
+      card('ΔAch vs ' + fmtDate(document.getElementById('weekA').value), fmtPP(dpp), 'so với tuần trước', dpp == null ? '' : (dpp >= 0 ? 'var(--green)' : 'var(--red)')) +
+    '</div>' +
+    '<div class="kpi-bar-wrap"><div class="kpi-bar"><div class="kpi-bar-fill" style="width:' + pctW + '%;background:' + col + '"></div></div>' +
+    '<div class="kpi-bar-legend"><span>0%</span><span>KPI = 100% · ' + fmtM0(kpi) + 'M</span></div></div>' +
+    (kpiYearWarn() ? '<div class="kpi-note">' + kpiYearWarn() + '</div>' : '');
+}
+
+// ── KPI: bảng theo dimension (tab Breakdown Analysis) ─────────────────────
+function renderKPIBreakdown() {
+  const card = document.getElementById('kpi-bd-card');
+  if(!card) return;
+  // Sub-tab "Detail" là drill-down 3 cấp tới client → không hiện bảng KPI
+  if(currentBreakdown > 4) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  const a = document.getElementById('weekA').value;
+  const b = document.getElementById('weekB').value;
+  const lbl = BD_LABELS[currentBreakdown];
+  const tbl  = document.getElementById('kpi-bd-table');
+  const note = document.getElementById('kpi-bd-note');
+  document.getElementById('kpi-bd-title').textContent =
+    'KPI Tracking — ' + lbl + ' | ' + getQLabel() + ' · Total GP2 (GP2 + new_new) vs GP2 KPI (M VNĐ)';
+
+  if(!kpiRawData.length || !kpiCols || !kpiCols.kpi) {
+    tbl.innerHTML = '';
+    note.innerHTML = '<span style="color:var(--red)">' + (kpiStatusMsg || 'Chưa có dữ liệu KPI') + '</span>';
+    return;
+  }
+  if(kpiYearMismatch()) {
+    tbl.innerHTML = '';
+    note.innerHTML = 'Sheet KPI chỉ có cột Month (1–12) nên toàn bộ KPI được coi là của năm <b>' + KPI_YEAR + '</b>. Chọn Năm = ' + KPI_YEAR + ' hoặc "Tất cả" để xem KPI.';
+    return;
+  }
+
+  const dimField = BD_DIMS[currentBreakdown];
+  const kpiField = KPI_DIM_FIELDS[currentBreakdown];
+  if(!kpiCols[kpiField]) {
+    tbl.innerHTML = '';
+    note.innerHTML = '<span style="color:var(--red)">Sheet KPI không có cột tương ứng với <b>' + lbl + '</b> — xem chi tiết ở tab Data Quality.</span>';
+    return;
+  }
+
+  const kRows = filterKPIRows();
+  const kMap = kpiByDim(kRows, kpiField);
+  const fAm = totalGP2ByDim(filterQ(wkAData), dimField);
+  const fBm = totalGP2ByDim(filterQ(wkBData), dimField);
+  const keys = [...new Set([...Object.keys(fBm), ...Object.keys(fAm), ...Object.keys(kMap)])];
+
+  const rows = keys.map(k => {
+    const kpi = kMap[k] ? kMap[k].val : 0;
+    const ta = fAm[k] ? fAm[k].val : 0;
+    const tb = fBm[k] ? fBm[k].val : 0;
+    const label = (fBm[k] && fBm[k].label) || (fAm[k] && fAm[k].label) || (kMap[k] && kMap[k].label) || k;
+    const hasKpi = !!(kMap[k] && kpi !== 0);
+    return {
+      k, label, kpi, ta, tb, hasKpi,
+      gap:  hasKpi ? tb - kpi : null,
+      ach:  hasKpi ? tb / kpi : null,
+      achA: hasKpi ? ta / kpi : null
+    };
+  }).filter(r => r.hasKpi || r.ta !== 0 || r.tb !== 0);
+
+  // Hụt KPI nhiều nhất lên đầu; member chưa có KPI xuống cuối
+  rows.sort((x, y) => {
+    if(x.hasKpi !== y.hasKpi) return x.hasKpi ? -1 : 1;
+    if(x.hasKpi) return x.gap - y.gap;
+    return y.tb - x.tb;
+  });
+
+  const body = rows.map(r => {
+    const dpp = (r.ach != null && r.achA != null) ? (r.ach - r.achA) * 100 : null;
+    const gapLM = r.tb - r.ta;
+    return '<tr>' +
+      '<td>' + r.label + '</td>' +
+      '<td>' + fmtM0(r.ta) + '</td>' +
+      '<td>' + fmtM0(r.tb) + '</td>' +
+      '<td class="kpi-col">' + (r.hasKpi ? fmtM0(r.kpi) : '–') + '</td>' +
+      '<td class="' + varClass(gapLM) + '">' + fmtSigned0(gapLM) + '</td>' +
+      '<td class="' + (r.gap == null ? 'neutral' : varClass(r.gap)) + '">' + (r.gap == null ? '–' : fmtSigned0(r.gap)) + '</td>' +
+      '<td style="font-weight:600;color:' + (r.ach == null ? 'var(--text3)' : kpiColor(r.ach)) + '">' + (r.ach == null ? '–' : (r.ach * 100).toFixed(1) + '%') + '</td>' +
+      '<td class="' + (dpp == null ? 'neutral' : varClass(dpp)) + '">' + fmtPP(dpp) + '</td>' +
+      '<td>' + kpiBadge(r.ach) + '</td>' +
+    '</tr>';
+  }).join('');
+
+  // Total dùng tổng KPI của toàn bộ dòng đã lọc (kể cả dòng có dimension trống)
+  const tKpi = kpiTotal(kRows);
+  const tA = Object.values(fAm).reduce((s,v) => s + v.val, 0);
+  const tB = Object.values(fBm).reduce((s,v) => s + v.val, 0);
+  const tGap = tB - tKpi;
+  const tAch  = tKpi ? tB / tKpi : null;
+  const tAchA = tKpi ? tA / tKpi : null;
+  const tDpp = (tAch != null && tAchA != null) ? (tAch - tAchA) * 100 : null;
+
+  tbl.innerHTML =
+    '<thead><tr>' +
+      '<th>' + lbl + '</th>' +
+      '<th>Total GP2 ' + fmtDate(a) + '</th>' +
+      '<th>Total GP2 ' + fmtDate(b) + '</th>' +
+      '<th class="kpi-col">GP2 KPI</th>' +
+      '<th>Gap vs LM (M)</th>' +
+      '<th>Gap vs KPI (M)</th><th>Achieve vs KPI (%)</th><th>ΔAch</th><th>Status</th>' +
+    '</tr></thead><tbody>' + body +
+    '<tr class="total-row">' +
+      '<td>TOTAL</td>' +
+      '<td>' + fmtM0(tA) + '</td><td>' + fmtM0(tB) + '</td>' +
+      '<td class="kpi-col">' + fmtM0(tKpi) + '</td>' +
+      '<td class="' + varClass(tB - tA) + '">' + fmtSigned0(tB - tA) + '</td>' +
+      '<td class="' + varClass(tGap) + '">' + fmtSigned0(tGap) + '</td>' +
+      '<td style="color:' + (tAch == null ? 'var(--text3)' : kpiColor(tAch)) + '">' + (tAch == null ? '–' : (tAch * 100).toFixed(1) + '%') + '</td>' +
+      '<td class="' + (tDpp == null ? 'neutral' : varClass(tDpp)) + '">' + fmtPP(tDpp) + '</td>' +
+      '<td>' + kpiBadge(tAch) + '</td>' +
+    '</tr></tbody>';
+
+  // Ghi chú đối chiếu
+  const noKpi = rows.filter(r => !r.hasKpi);
+  const noFc  = rows.filter(r => r.hasKpi && r.ta === 0 && r.tb === 0);
+  const sumKMap = Object.values(kMap).reduce((s,v) => s + v.val, 0);
+  let n = '<div><b>Ach%</b> = Total GP2 (' + fmtDate(b) + ') ÷ GP2 KPI · <b>Gap</b> = Total GP2 (' + fmtDate(b) + ') − GP2 KPI · <b>ΔAch</b> = Ach% tuần ' + fmtDate(b) + ' − Ach% tuần ' + fmtDate(a) + ' (điểm phần trăm)</div>';
+  if(noKpi.length) {
+    n += '<div class="kpi-warn">⚠️ ' + noKpi.length + ' ' + lbl + ' có forecast nhưng <b>chưa có KPI</b> (tổng ' + fmtM0(noKpi.reduce((s,r) => s + r.tb, 0)) + 'M): ' +
+         noKpi.slice(0,6).map(r => r.label).join(', ') + (noKpi.length > 6 ? ' …' : '') + '</div>';
+  }
+  if(noFc.length) {
+    n += '<div class="kpi-warn">⚠️ ' + noFc.length + ' ' + lbl + ' có KPI nhưng <b>không có forecast</b> (tổng KPI ' + fmtM0(noFc.reduce((s,r) => s + r.kpi, 0)) + 'M): ' +
+         noFc.slice(0,6).map(r => r.label).join(', ') + (noFc.length > 6 ? ' …' : '') + '</div>';
+  }
+  if(Math.abs(sumKMap - tKpi) > 0.05) {
+    n += '<div class="kpi-warn">⚠️ ' + fmtM0(tKpi - sumKMap) + 'M KPI có cột <b>' + lbl + '</b> để trống nên không gom vào dòng nào (vẫn được tính trong TOTAL).</div>';
+  }
+  n += kpiYearWarn();
+  note.innerHTML = n;
+}
+
+// ── KPI: diagnostics (tab Data Quality) ───────────────────────────────────
+function renderKPIDiag() {
+  const el = document.getElementById('dq-kpi');
+  if(!el) return;
+  const dot = (c) => '<div class="dq-dot" style="background:' + c + '"></div>';
+  let h = '<div class="dq-stat">' + dot(kpiRawData.length ? 'var(--green)' : 'var(--red)') +
+          '<div><b>sheet kpi_master_data:</b> ' + kpiRawData.length + ' dòng' + (kpiStatusMsg ? ' — <span style="color:var(--red)">' + kpiStatusMsg + '</span>' : '') + '</div></div>';
+
+  if(kpiCols) {
+    const code = (t) => '<code style="background:var(--surface2);padding:1px 5px;border-radius:4px">' + t + '</code>';
+    Object.keys(KPI_COL_REQUIRED).forEach(f => {
+      const ok = !!kpiCols[f];
+      const rej = (kpiCols.__rejected && kpiCols.__rejected[f]) || [];
+      let txt = KPI_COL_REQUIRED[f] + ' → ' + (ok ? code(kpiCols[f]) : '<b style="color:var(--red)">không tìm thấy cột chữ phù hợp</b>');
+      if(ok && kpiCols.__sample && kpiCols.__sample[kpiCols[f]] && kpiCols.__sample[kpiCols[f]].length) {
+        txt += ' <span style="color:var(--text3)">· vd: ' + kpiCols.__sample[kpiCols[f]].slice(0,3).join(' | ') + '</span>';
+      }
+      if(rej.length) txt += ' <span class="kpi-warn">· đã bỏ qua ' + rej.map(code).join(', ') + ' vì giá trị toàn số</span>';
+      const au = kpiCols.__auto && kpiCols.__auto[f];
+      if(au) txt += ' <span style="color:var(--accent)">· tự nhận theo giá trị: khớp ' + au.matched + '/' + au.total + ' giá trị của forecast' + (au.from ? ', thay cho cột ' + code(au.from) : '') + '</span>';
+      else {
+        const ov = kpiCols.__overlap && kpiCols.__overlap[f];
+        if(ov && ok) txt += ' <span style="color:var(--text3)">· khớp ' + ov.matched + '/' + ov.total + ' giá trị của forecast</span>';
+      }
+      h += '<div class="dq-stat">' + dot(ok ? 'var(--green)' : 'var(--red)') + '<div>' + txt + '</div></div>';
+    });
+
+    // Dump toàn bộ header + giá trị mẫu để đối chiếu khi map sai
+    if(kpiCols.__all) {
+      const list = kpiCols.__all.map(k => '<div style="padding:2px 0">' + code(k) + ' <span style="color:var(--text3)">' +
+        ((kpiCols.__sample[k] || []).slice(0,3).join(' | ') || '(trống)') + '</span></div>').join('');
+      h += '<div class="dq-stat">' + dot('var(--text3)') + '<div><b>Toàn bộ ' + kpiCols.__all.length + ' cột trong sheet KPI:</b>' + list + '</div></div>';
+    }
+
+    // Đối chiếu giá trị dimension giữa sheet KPI và sheet forecast
+    const kRows = filterKPIRows();
+    const fRows = filterQ(wkBData);
+    KPI_DIM_FIELDS.forEach((f, i) => {
+      if(!kpiCols[f]) return;
+      const kMap = kpiByDim(kRows, f);
+      const fMap = totalGP2ByDim(fRows, BD_DIMS[i]);
+      const onlyK = Object.keys(kMap).filter(k => !fMap[k]).map(k => kMap[k].label);
+      const onlyF = Object.keys(fMap).filter(k => !kMap[k]).map(k => fMap[k].label);
+      const ok = !onlyK.length && !onlyF.length;
+      let txt = '<b>' + BD_LABELS[i] + ':</b> ';
+      if(ok) txt += 'khớp toàn bộ ' + Object.keys(kMap).length + ' giá trị';
+      else {
+        const parts = [];
+        if(onlyK.length) parts.push(onlyK.length + ' chỉ có ở KPI (' + onlyK.slice(0,4).join(', ') + (onlyK.length > 4 ? '…' : '') + ')');
+        if(onlyF.length) parts.push(onlyF.length + ' chỉ có ở forecast (' + onlyF.slice(0,4).join(', ') + (onlyF.length > 4 ? '…' : '') + ')');
+        txt += parts.join(' · ');
+      }
+      h += '<div class="dq-stat">' + dot(ok ? 'var(--green)' : 'var(--amber)') + '<div>' + txt + '</div></div>';
+    });
+  }
+
+  h += '<div class="dq-stat">' + dot('var(--accent)') + '<div><b>Ngưỡng badge</b> (' +
+       (kpiThFromSheet ? 'sheet <code>kpi_threshold</code>' : 'mặc định trong file — chưa đọc được sheet kpi_threshold') + '): ' +
+       kpiThresholds.map(t => (t.emoji ? t.emoji + ' ' : '') + t.label + ' ≥ ' + t.min + '%').join(' · ') + '</div></div>';
+  h += '<div class="dq-stat">' + dot('var(--text3)') + '<div>KPI không có cột Year → toàn bộ được coi là năm <b>' + KPI_YEAR + '</b> (sửa hằng số <code>KPI_YEAR</code> khi sang năm mới)</div></div>';
+  el.innerHTML = h;
 }
 
 // ── NAV ────────────────────────────────────────────────────────────────────
